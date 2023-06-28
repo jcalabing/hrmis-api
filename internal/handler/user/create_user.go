@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/jcalabing/hrmis-api/internal/common/errors"
 	"github.com/jcalabing/hrmis-api/internal/model"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -19,7 +20,11 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 	body := new(CreateUserRequestBody)
 
 	if err := c.BodyParser(body); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse request body")
+		return c.Status(fiber.StatusBadRequest).JSON(errors.NewErrorResponse(
+			fiber.StatusBadRequest,
+			"Something went wrong with your request.",
+			"Failed to parse request body",
+		))
 	}
 
 	validate := validator.New()
@@ -30,13 +35,22 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 		for _, err := range err.(validator.ValidationErrors) {
 			validationErrors = append(validationErrors, err.Field())
 		}
-		errorMsg := "The following fields are required: " + strings.Join(validationErrors, ", ")
-		return fiber.NewError(fiber.StatusBadRequest, errorMsg)
+		errorMsg := "Kindly check the following fields: " + strings.Join(validationErrors, ", ")
+
+		return c.Status(fiber.StatusBadRequest).JSON(errors.NewErrorResponse(
+			fiber.StatusBadRequest,
+			errorMsg,
+			validationErrors,
+		))
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to hash Password")
+		return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
+			fiber.StatusInternalServerError,
+			"Something went wrong with your request.",
+			"Failed to hash Password",
+		))
 	}
 
 	user := model.User{
@@ -46,10 +60,14 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 	}
 
 	if result := h.DB.Create(&user); result.Error != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create User")
+		return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
+			fiber.StatusInternalServerError,
+			"Cannot create user.",
+			"The username or email are not available.",
+		))
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(&user)
+	return c.Status(fiber.StatusCreated).JSON("OK")
 }
 
 func validateNonEmpty(fl validator.FieldLevel) bool {
