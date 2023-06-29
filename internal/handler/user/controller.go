@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/jcalabing/hrmis-api/internal/middleware"
 	"gorm.io/gorm"
 )
 
@@ -14,7 +15,7 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 		DB: db,
 	}
 
-	routes := app.Group("/user")
+	routes := app.Group("/user", middleware.RequireAuth(h.DB))
 	routes.Get("/", h.GetUser)
 	routes.Post("/", h.CreateUser)
 

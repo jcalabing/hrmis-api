@@ -8,12 +8,12 @@ import (
 func (h handler) GetUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 
-	var book model.User
+	var user model.User
 
-	if result := h.DB.First(&book, id); result.Error != nil {
+	if result := h.DB.First(&user, id); result.Error != nil {
 		return fiber.NewError(fiber.StatusNotFound, result.Error.Error())
 	}
 
-	return c.Status(fiber.StatusOK).JSON(&book)
+	return c.Status(fiber.StatusOK).JSON(&user)
 
 }

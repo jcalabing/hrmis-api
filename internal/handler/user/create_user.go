@@ -22,8 +22,8 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 	if err := c.BodyParser(body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errors.NewErrorResponse(
 			fiber.StatusBadRequest,
-			"Something went wrong with your request.",
-			"Failed to parse request body",
+			"",
+			"",
 		))
 	}
 
@@ -48,7 +48,7 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
 			fiber.StatusInternalServerError,
-			"Something went wrong with your request.",
+			"",
 			"Failed to hash Password",
 		))
 	}
@@ -62,7 +62,7 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 	if result := h.DB.Create(&user); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
 			fiber.StatusInternalServerError,
-			"Cannot create user.",
+			"",
 			"The username or email are not available.",
 		))
 	}
