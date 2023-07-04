@@ -32,14 +32,12 @@ func (h *handler) CreateToken(c *fiber.Ctx) error {
 	h.DB.First(&user, "username = ?", body.Username)
 
 	if user.ID == 0 {
+		return c.Status(fiber.StatusUnauthorized).JSON(errors.NewErrorResponse(
+			fiber.StatusUnauthorized,
+			"",
+			"Invalid username or password",
+		))
 
-		if err := c.BodyParser(body); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(errors.NewErrorResponse(
-				fiber.StatusBadRequest,
-				"",
-				"Invalid username or password",
-			))
-		}
 	}
 
 	//compare sent in password
@@ -47,13 +45,11 @@ func (h *handler) CreateToken(c *fiber.Ctx) error {
 
 	if err != nil {
 
-		if err := c.BodyParser(body); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(errors.NewErrorResponse(
-				fiber.StatusBadRequest,
-				"",
-				"Invalid username or password",
-			))
-		}
+		return c.Status(fiber.StatusUnauthorized).JSON(errors.NewErrorResponse(
+			fiber.StatusUnauthorized,
+			"",
+			"Invalid username or password",
+		))
 	}
 
 	//generate jwt token
@@ -80,5 +76,5 @@ func (h *handler) CreateToken(c *fiber.Ctx) error {
 		HTTPOnly: true,
 	})
 
-	return c.Status(fiber.StatusOK).JSON("OK")
+	return c.Status(fiber.StatusOK).JSON(user)
 }
