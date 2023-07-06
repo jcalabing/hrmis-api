@@ -17,5 +17,7 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	routes := app.Group("/token")
 	//login
 	routes.Post("/", h.CreateToken)
+	//load user
+	routes.Get("/", h.GetToken)
 
 }

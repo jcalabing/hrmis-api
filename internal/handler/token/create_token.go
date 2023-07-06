@@ -32,11 +32,7 @@ func (h *handler) CreateToken(c *fiber.Ctx) error {
 	h.DB.First(&user, "username = ?", body.Username)
 
 	if user.ID == 0 {
-		return c.Status(fiber.StatusUnauthorized).JSON(errors.NewErrorResponse(
-			fiber.StatusUnauthorized,
-			"",
-			"Invalid username or password",
-		))
+		return c.Status(fiber.StatusUnauthorized).JSON(errors.UnAuthorized())
 
 	}
 
@@ -45,11 +41,7 @@ func (h *handler) CreateToken(c *fiber.Ctx) error {
 
 	if err != nil {
 
-		return c.Status(fiber.StatusUnauthorized).JSON(errors.NewErrorResponse(
-			fiber.StatusUnauthorized,
-			"",
-			"Invalid username or password",
-		))
+		return c.Status(fiber.StatusUnauthorized).JSON(errors.UnAuthorized())
 	}
 
 	//generate jwt token
@@ -69,12 +61,12 @@ func (h *handler) CreateToken(c *fiber.Ctx) error {
 		))
 	}
 
-	c.Cookie(&fiber.Cookie{
-		Name:     "Authorization",
-		Expires:  time.Now().Add(time.Hour * 24),
-		Value:    tokenString,
-		HTTPOnly: true,
-	})
+	convertedUser := model.ConvertToUserResponse(user)
 
-	return c.Status(fiber.StatusOK).JSON(user)
+	returnValue := map[string]any{
+		"token": tokenString,
+		"user":  convertedUser,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(returnValue)
 }
