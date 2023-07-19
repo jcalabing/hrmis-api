@@ -61,7 +61,7 @@ func (h *handler) CreateToken(c *fiber.Ctx) error {
 		))
 	}
 
-	convertedUser := model.ConvertToUserResponse(user)
+	convertedUser := model.ConvertToUserResponse(h.DB, user)
 
 	returnValue := map[string]any{
 		"token": tokenString,

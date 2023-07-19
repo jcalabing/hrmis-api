@@ -16,6 +16,7 @@ func Init(url string) *gorm.DB {
 	}
 
 	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.UserField{})
 
 	return db
 }

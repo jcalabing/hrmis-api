@@ -50,7 +50,7 @@ func (h *handler) GetToken(c *fiber.Ctx) error {
 		}
 
 		returnValue := map[string]any{
-			"user": model.ConvertToUserResponse(user),
+			"user": model.ConvertToUserResponse(h.DB, user),
 		}
 		return c.Status(fiber.StatusOK).JSON(returnValue)
 	}

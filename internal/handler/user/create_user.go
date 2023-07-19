@@ -6,6 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jcalabing/hrmis-api/internal/common/errors"
+	"github.com/jcalabing/hrmis-api/internal/common/functions"
 	"github.com/jcalabing/hrmis-api/internal/model"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -28,7 +29,7 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 	}
 
 	validate := validator.New()
-	validate.RegisterValidation("nonempty", validateNonEmpty)
+	validate.RegisterValidation("nonempty", functions.ValidateNonEmpty)
 
 	if err := validate.Struct(body); err != nil {
 		var validationErrors []string
@@ -70,8 +71,8 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON("OK")
 }
 
-func validateNonEmpty(fl validator.FieldLevel) bool {
-	field := fl.Field()
-	value := strings.TrimSpace(field.String())
-	return value != ""
-}
+// func validateNonEmpty(fl validator.FieldLevel) bool {
+// 	field := fl.Field()
+// 	value := strings.TrimSpace(field.String())
+// 	return value != ""
+// }
