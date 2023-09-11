@@ -1,6 +1,10 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"strings"
+
+	"gorm.io/gorm"
+)
 
 type UserField struct {
 	gorm.Model
@@ -16,7 +20,7 @@ type ShortenField struct {
 
 func ConvertToShortenField(userfield UserField) ShortenField {
 	return ShortenField{
-		Key:   userfield.Key,
+		Key:   strings.ToLower(userfield.Key),
 		Value: userfield.Value,
 	}
 }

@@ -12,9 +12,9 @@ import (
 )
 
 type CreateRequestBody struct {
-	Firstname  string `json:"firstname" validate:"required,nonempty"`
-	Lastname   string `json:"lastname" validate:"required,nonempty"`
-	Middlename string `json:"middlename" validate:"required,nonempty"`
+	Firstname  string `json:"Firstname" validate:"required,nonempty"`
+	Lastname   string `json:"Lastname" validate:"required,nonempty"`
+	Middlename string `json:"Middlename" validate:"required,nonempty"`
 }
 
 func (h *handler) UpdateProfile(c *fiber.Ctx) error {
