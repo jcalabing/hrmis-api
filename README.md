@@ -17,3 +17,5 @@ on first time setup
 1: open terminal and run "go run ."
 2: open browser and open "http://127.0.0.1:9000/setup"
 3: create a super admin
+
+test
