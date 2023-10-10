@@ -9,6 +9,7 @@ type User struct {
 	Username  string         `gorm:"unique"`
 	Email     string         `gorm:"unique"`
 	Password  string         `json:"-"`
+	Active    string         `json:"active"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	Fields    []UserField    `gorm:"foreignKey:user_id"`
 }

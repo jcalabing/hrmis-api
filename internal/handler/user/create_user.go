@@ -12,9 +12,28 @@ import (
 )
 
 type CreateUserRequestBody struct {
-	Username string `json:"username" validate:"required,nonempty"`
-	Email    string `json:"email" validate:"required,email,nonempty"`
-	Password string `json:"password" validate:"required,nonempty"`
+	// Username string `json:"username" validate:"required,nonempty"`
+	Email                string `json:"email" validate:"required,email,nonempty"`
+	Password             string `json:"password" validate:"required,nonempty"`
+	Active               string `json:"active"`
+	Agencyemployeenumber string `json:"agencyemployeenumber"`
+	Assignment           string `json:"assignment"`
+	Civilstatus          string `json:"civilstatus"`
+	Dailyrate            string `json:"dailyrate"`
+	Dateofbirth          string `json:"dateofbirth"`
+	Division             string `json:"division"`
+	Extname              string `json:"extname"`
+	Firstname            string `json:"firstname"`
+	Itemnumber           string `json:"itemnumber"`
+	Middlename           string `json:"middlename"`
+	Office               string `json:"office"`
+	Plantilla            string `json:"plantilla"`
+	Positiontitle        string `json:"positiontitle"`
+	Remarks              string `json:"remarks"`
+	Salarygrade          string `json:"salarygrade"`
+	Sex                  string `json:"sex"`
+	Sgstep               string `json:"sgstep"`
+	Surname              string `json:"surname"`
 }
 
 func (h *handler) CreateUser(c *fiber.Ctx) error {
@@ -55,7 +74,8 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 	}
 
 	user := model.User{
-		Username: body.Username,
+		// Username: body.Username,
+		Username: body.Email,
 		Password: string(hash),
 		Email:    body.Email,
 	}

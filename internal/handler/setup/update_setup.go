@@ -67,6 +67,7 @@ func (h *handler) UpdateSetup(c *fiber.Ctx) error {
 		Username: body.Username,
 		Password: string(hash),
 		Email:    body.Email,
+		Active:   "YES",
 	}
 
 	if result := h.DB.Create(&user); result.Error != nil {
