@@ -1,6 +1,8 @@
 package user
 
 import (
+	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -78,6 +80,7 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 		Username: body.Email,
 		Password: string(hash),
 		Email:    body.Email,
+		Active:   body.Active,
 	}
 
 	if result := h.DB.Create(&user); result.Error != nil {
@@ -88,7 +91,65 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 		))
 	}
 
-	return c.Status(fiber.StatusCreated).JSON("OK")
+	fmt.Println(user.ID)
+	//User create fields
+	fieldlist := []string{"Active",
+		"Agencyemployeenumber",
+		"Assignment",
+		"Civilstatus",
+		"Dailyrate",
+		"Dateofbirth",
+		"Division",
+		"Extname",
+		"Firstname",
+		"Itemnumber",
+		"Middlename",
+		"Office",
+		"Plantilla",
+		"Positiontitle",
+		"Remarks",
+		"Salarygrade",
+		"Sex",
+		"Sgstep",
+		"Surname"}
+	for _, fieldName := range fieldlist {
+		fieldValue := reflect.ValueOf(body).Elem().FieldByName(fieldName)
+		fmt.Println(fieldValue)
+		if fieldValue.IsValid() {
+			userfield := model.UserField{
+				Key:    strings.ToLower(fieldName),
+				Value:  fieldValue.Interface().(string),
+				UserID: user.ID,
+			}
+			// Look for User
+			// var oldUserField model.UserField
+			// h.DB.Where("user_id = ? AND key = ?", userfield.UserID, userfield.Key).First(&oldUserField)
+
+			// If key does not exist, create a new UserField
+			// if oldUserField.ID == 0 {
+			if result := h.DB.Create(&userfield); result.Error != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
+					fiber.StatusInternalServerError,
+					"",
+					"Error occurred while creating the new user field.",
+				))
+			}
+			// } else {
+			// 	// If key exists, update the existing UserField
+			// 	if result := h.DB.Model(&oldUserField).Updates(&userfield); result.Error != nil {
+			// 		return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
+			// 			fiber.StatusInternalServerError,
+			// 			"",
+			// 			"Error occurred while updating the user field.",
+			// 		))
+			// 	}
+			// }
+		}
+
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(user)
+	// return c.Status(fiber.StatusCreated).JSON("OK")
 }
 
 // func validateNonEmpty(fl validator.FieldLevel) bool {

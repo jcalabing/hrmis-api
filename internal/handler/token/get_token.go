@@ -1,7 +1,7 @@
 package token
 
 import (
-	"fmt"
+	// "fmt"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,7 +14,7 @@ import (
 func (h *handler) GetToken(c *fiber.Ctx) error {
 	authorization := c.Get("Authorization")
 
-	fmt.Println(authorization)
+	// fmt.Println(authorization)
 	// Check if the Authorization header is present
 	if authorization == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(errors.UnAuthorized())
@@ -41,7 +41,7 @@ func (h *handler) GetToken(c *fiber.Ctx) error {
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		//find the user based on ID
-		fmt.Println(claims["exp"], claims["sub"])
+		// fmt.Println(claims["exp"], claims["sub"])
 		var user model.User
 		h.DB.First(&user, claims["sub"])
 		if user.ID == 0 {

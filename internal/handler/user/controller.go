@@ -16,7 +16,8 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	}
 
 	routes := app.Group("/user", middleware.RequireAuth(h.DB))
-	routes.Get("/", h.GetUser)
+	routes.Get("/:id", h.GetUser)
+	routes.Get("/", h.GetUsers)
 	routes.Post("/", h.CreateUser)
 
 }
