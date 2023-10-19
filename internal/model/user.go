@@ -14,9 +14,9 @@ type User struct {
 	Fields    []UserField    `gorm:"foreignKey:user_id"`
 }
 type UserResponse struct {
-	Username string         `json:"username"`
-	Email    string         `json:"email"`
-	Fields   []ShortenField `json:"fields"`
+	Username string            `json:"username"`
+	Email    string            `json:"email"`
+	Fields   map[string]string `json:"fields"`
 }
 
 func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
@@ -27,9 +27,15 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 		shortenedFields[i] = ConvertToShortenField(field)
 	}
 
+	result := make(map[string]string)
+
+	for _, field := range shortenedFields {
+		result[field.Key] = field.Value
+	}
+
 	return UserResponse{
 		Username: user.Username,
 		Email:    user.Email,
-		Fields:   shortenedFields,
+		Fields:   result,
 	}
 }
