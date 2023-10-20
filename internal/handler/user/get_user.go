@@ -14,9 +14,11 @@ func (h handler) GetUser(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusNotFound, result.Error.Error())
 	}
 
-	returnValue := map[string]any{
-		"user": model.ConvertToUserResponse(h.DB, user),
-	}
+	// returnValue := map[string]any{
+	// 	"user": model.ConvertToUserResponse(h.DB, user),
+	// }
+
+	returnValue := model.ConvertToUserResponse(h.DB, user)
 
 	return c.Status(fiber.StatusOK).JSON(&returnValue)
 	// return c.Status(fiber.StatusOK).JSON(&user)

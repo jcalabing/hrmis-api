@@ -14,6 +14,7 @@ type User struct {
 	Fields    []UserField    `gorm:"foreignKey:user_id"`
 }
 type UserResponse struct {
+	Id       int               `json:"id"`
 	Username string            `json:"username"`
 	Email    string            `json:"email"`
 	Fields   map[string]string `json:"fields"`
@@ -34,6 +35,7 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 	}
 
 	return UserResponse{
+		Id:       int(user.ID),
 		Username: user.Username,
 		Email:    user.Email,
 		Fields:   result,
