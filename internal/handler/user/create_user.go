@@ -91,7 +91,7 @@ func (h *handler) CreateUser(c *fiber.Ctx) error {
 		))
 	}
 
-	fmt.Println(user.ID)
+	// fmt.Println(user.ID)
 	//User create fields
 	fieldlist := []string{"Active",
 		"Agencyemployeenumber",
