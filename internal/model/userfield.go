@@ -13,13 +13,13 @@ type UserField struct {
 	Value  string `gorm:"column:value" json:"value"`
 }
 
-type ShortenField struct {
+type UserShortenField struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
 
-func ConvertToShortenField(userfield UserField) ShortenField {
-	return ShortenField{
+func ConvertToUserShortenField(userfield UserField) UserShortenField {
+	return UserShortenField{
 		Key:   strings.ToLower(userfield.Key),
 		Value: userfield.Value,
 	}

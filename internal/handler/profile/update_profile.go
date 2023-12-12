@@ -1,6 +1,8 @@
 package profile
 
 import (
+	"encoding/json"
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -87,6 +89,11 @@ type CreateRequestBody struct {
 	Pwddetails                  string `json:"pwddetails"`
 	Soloparent                  string `json:"soloparent"`
 	Soloparentdetails           string `json:"soloparentdetails"`
+	Filipino                    string `json:"filipino"`
+	Dualcitizenship             string `json:"dualcitizenship"`
+	Bybirth                     string `json:"bybirth"`
+	Naturalized                 string `json:"naturalized"`
+	Education                   string `json:"education"`
 }
 
 func (h *handler) UpdateProfile(c *fiber.Ctx) error {
@@ -117,7 +124,8 @@ func (h *handler) UpdateProfile(c *fiber.Ctx) error {
 		))
 	}
 
-	fieldlist := []string{"Firstname",
+	fieldlist := []string{
+		"Firstname",
 		"Surname",
 		"Civilstatus",
 		"Sex",
@@ -191,7 +199,12 @@ func (h *handler) UpdateProfile(c *fiber.Ctx) error {
 		"Pwd",
 		"Pwddetails",
 		"Soloparent",
-		"Soloparentdetails"}
+		"Soloparentdetails",
+		"Filipino",
+		"Dualcitizenship",
+		"Bybirth",
+		"Naturalized",
+	}
 
 	profile := c.Locals("profile").(model.User)
 	for _, fieldName := range fieldlist {
@@ -227,6 +240,16 @@ func (h *handler) UpdateProfile(c *fiber.Ctx) error {
 			}
 		}
 
+	}
+
+	///////education array/////////////////////////////////////////////////////////////////////////////////////
+	var eduArray []map[string]interface{}
+
+	// Unmarshal the JSON array into the map
+	if err := json.Unmarshal([]byte(body.Education), &eduArray); err != nil {
+		fmt.Println("Error unmarshaling Education:", err)
+	} else {
+		fmt.Printf("%+v\n", eduArray)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(&profile)

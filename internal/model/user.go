@@ -22,10 +22,10 @@ type UserResponse struct {
 
 func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 	db.Preload("Fields").Find(&user)
-	shortenedFields := make([]ShortenField, len(user.Fields))
+	shortenedFields := make([]UserShortenField, len(user.Fields))
 
 	for i, field := range user.Fields {
-		shortenedFields[i] = ConvertToShortenField(field)
+		shortenedFields[i] = ConvertToUserShortenField(field)
 	}
 
 	result := make(map[string]string)
