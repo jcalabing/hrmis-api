@@ -1,9 +1,6 @@
 package profile
 
 import (
-	"encoding/json"
-	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
@@ -97,8 +94,22 @@ type CreateRequestBody struct {
 }
 
 func (h *handler) UpdateProfile(c *fiber.Ctx) error {
-	body := new(CreateRequestBody)
 
+	var profile model.User
+	if c.Params("id") != "" {
+		if result := h.DB.First(&profile, c.Params("id")); result.Error != nil {
+			// return fiber.NewError(fiber.StatusNotFound, result.Error.Error())
+			return c.Status(fiber.StatusBadRequest).JSON(errors.NewErrorResponse(
+				fiber.StatusBadRequest,
+				"",
+				"User Not Found",
+			))
+		}
+	} else {
+		profile = c.Locals("profile").(model.User)
+	}
+
+	body := new(CreateRequestBody)
 	if err := c.BodyParser(body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(errors.NewErrorResponse(
 			fiber.StatusBadRequest,
@@ -124,132 +135,14 @@ func (h *handler) UpdateProfile(c *fiber.Ctx) error {
 		))
 	}
 
-	fieldlist := []string{
-		"Firstname",
-		"Surname",
-		"Civilstatus",
-		"Sex",
-		"Dateofbirth",
-		"Email",
-		"Mobilenumber",
-		"Issuedid",
-		"Issuedidnumber",
-		"Issuedidissuance",
-		"Middlename",
-		"Extname",
-		"Placeofbirth",
-		"Height",
-		"Weight",
-		"Bloodtype",
-		"Gsis",
-		"Pagibig",
-		"Philhealth",
-		"Sss",
-		"Tin",
-		"Agencyemployeenumber",
-		"Country",
-		"Residentialhouse",
-		"Residentialstreet",
-		"Residentialsubdivision",
-		"Residentialbarangay",
-		"Residentialmunicipality",
-		"Residentialprovince",
-		"Residentialzip",
-		"Permanenthouse",
-		"Permanentstreet",
-		"Permanentsubdivision",
-		"Permanentbarangay",
-		"Permanentmunicipality",
-		"Permanentprovince",
-		"Permanentzip",
-		"Telephonenumber",
-		"Spousesurname",
-		"Spousefirstname",
-		"Spousemiddlename",
-		"Spousextname",
-		"Spouseoccupation",
-		"Spouseemployer",
-		"Spousebusinessaddress",
-		"Fathersurname",
-		"Fatherfirstname",
-		"Fathermiddlename",
-		"Fatherextname",
-		"Mothersurname",
-		"Motherfirstname",
-		"Mothermiddlename",
-		"Relatedthirddegree",
-		"Relatedfourthdegree",
-		"Relatedfourthdegreedetails",
-		"Guiltyofoffense",
-		"Guiltyofoffensedetail",
-		"Criminallycharged",
-		"Criminallychargeddetails",
-		"Criminalconvicted",
-		"Criminalconvicteddetails",
-		"Seperatedfromservice",
-		"Seperatedfromservicedetails",
-		"Candidate",
-		"Candidatedetails",
-		"Electionresigned",
-		"Electionresigneddetails",
-		"Immigrantstatus",
-		"Immigrantstatusdetails",
-		"Indigenousmember",
-		"Indigenousmemberdetails",
-		"Pwd",
-		"Pwddetails",
-		"Soloparent",
-		"Soloparentdetails",
-		"Filipino",
-		"Dualcitizenship",
-		"Bybirth",
-		"Naturalized",
+	//this will update the common fields of the Profile
+	if err := UpdateFields(h, c, profile, body); err != nil {
+		return err
 	}
 
-	profile := c.Locals("profile").(model.User)
-	for _, fieldName := range fieldlist {
-		fieldValue := reflect.ValueOf(body).Elem().FieldByName(fieldName)
-		if fieldValue.IsValid() {
-			userfield := model.UserField{
-				Key:    fieldName,
-				Value:  fieldValue.Interface().(string),
-				UserID: profile.ID,
-			}
-			// Look for User
-			var oldUserField model.UserField
-			h.DB.Where("user_id = ? AND key = ?", userfield.UserID, userfield.Key).First(&oldUserField)
-
-			// If key does not exist, create a new UserField
-			if oldUserField.ID == 0 {
-				if result := h.DB.Create(&userfield); result.Error != nil {
-					return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
-						fiber.StatusInternalServerError,
-						"",
-						"Error occurred while creating the new user field.",
-					))
-				}
-			} else {
-				// If key exists, update the existing UserField
-				if result := h.DB.Model(&oldUserField).Updates(&userfield); result.Error != nil {
-					return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
-						fiber.StatusInternalServerError,
-						"",
-						"Error occurred while updating the user field.",
-					))
-				}
-			}
-		}
-
-	}
-
-	///////education array/////////////////////////////////////////////////////////////////////////////////////
-	var eduArray []map[string]interface{}
-
-	// Unmarshal the JSON array into the map
-	if err := json.Unmarshal([]byte(body.Education), &eduArray); err != nil {
-		fmt.Println("Error unmarshaling Education:", err)
-	} else {
-		fmt.Printf("%+v\n", eduArray)
+	///////update education
+	if err := UpdateEdu(h, c, profile, body.Education); err != nil {
+		return err
 	}
 
 	return c.Status(fiber.StatusOK).JSON(&profile)

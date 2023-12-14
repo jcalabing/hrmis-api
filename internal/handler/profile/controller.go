@@ -17,5 +17,5 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 
 	routes := app.Group("/profile", middleware.RequireAuth(h.DB))
 	routes.Get("/", h.GetProfile)
-	routes.Post("/", h.UpdateProfile)
+	routes.Post("/:id?", h.UpdateProfile)
 }

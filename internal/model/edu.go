@@ -8,10 +8,11 @@ type Edu struct {
 	gorm.Model
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	Fields    []EduField     `gorm:"foreignKey:edu_id"`
+	UserID    uint           `json:"user_id"`
 }
 type EduResponse struct {
-	Id     int               `json:"id"`
-	Fields map[string]string `json:"fields"`
+	Id     int                    `json:"id"`
+	Fields map[string]interface{} `json:"fields"`
 }
 
 func ConvertToEduResponse(db *gorm.DB, edu Edu) EduResponse {
@@ -22,7 +23,7 @@ func ConvertToEduResponse(db *gorm.DB, edu Edu) EduResponse {
 		shortenedFields[i] = ConvertToEduShortenField(field)
 	}
 
-	result := make(map[string]string)
+	result := make(map[string]interface{})
 
 	for _, field := range shortenedFields {
 		result[field.Key] = field.Value
