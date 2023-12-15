@@ -7,20 +7,21 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jcalabing/hrmis-api/internal/common/errors"
+	"github.com/jcalabing/hrmis-api/internal/common/functions"
 	"github.com/jcalabing/hrmis-api/internal/model"
 	"gorm.io/gorm"
 )
 
 type edu struct {
-	Award     string `json:"award"`
-	Degree    string `json:"degree"`
-	Ended     string `json:"ended"`
-	From      string `json:"from"`
-	Graduated string `json:"graduated"`
-	Highest   string `json:"highest"`
-	ID        string `json:"id"`
-	Level     string `json:"level"`
-	School    string `json:"school"`
+	Award     string      `json:"award"`
+	Degree    string      `json:"degree"`
+	Ended     string      `json:"ended"`
+	From      string      `json:"from"`
+	Graduated string      `json:"graduated"`
+	Highest   string      `json:"highest"`
+	ID        interface{} `json:"id"`
+	Level     string      `json:"level"`
+	School    string      `json:"school"`
 }
 
 func UpdateEdu(h *handler, c *fiber.Ctx, profile model.User, education string) error {
@@ -43,10 +44,8 @@ func UpdateEdu(h *handler, c *fiber.Ctx, profile model.User, education string) e
 		"School",
 	}
 
+	var retainEdu []interface{}
 	for _, eduData := range eduArray {
-		fmt.Println("The Level is" + eduData.Level)
-		fmt.Printf("Struct: %+v\n", eduData)
-		fmt.Println("-------------------------------LOOP 1------------------------------------")
 		// create an education profile
 		eduAttain := model.Edu{
 			UserID: profile.ID,
@@ -59,7 +58,6 @@ func UpdateEdu(h *handler, c *fiber.Ctx, profile model.User, education string) e
 					"Error occurred while creating the new edu field.",
 				))
 			}
-			fmt.Println("HAS Empty ID")
 		} else {
 			if result := h.DB.First(&eduAttain, eduData.ID); result.Error != nil {
 				return c.Status(fiber.StatusBadRequest).JSON(errors.NewErrorResponse(
@@ -68,10 +66,7 @@ func UpdateEdu(h *handler, c *fiber.Ctx, profile model.User, education string) e
 					"Education Not Found",
 				))
 			}
-			fmt.Println("HAS VALID ID")
 		}
-		fmt.Println("-------------------------------LOOP 1 part 1------------------------------------")
-
 		for _, fieldName := range fieldlist {
 			fieldValue := reflect.ValueOf(eduData).FieldByName(fieldName)
 			if fieldValue.IsValid() {
@@ -100,7 +95,6 @@ func UpdateEdu(h *handler, c *fiber.Ctx, profile model.User, education string) e
 						))
 					}
 				} else {
-					fmt.Println("Has data")
 					// If key exists, update the existing EduField
 					if err := h.DB.Model(&oldEduField).Updates(&edufield).Error; err != nil {
 						return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
@@ -113,7 +107,21 @@ func UpdateEdu(h *handler, c *fiber.Ctx, profile model.User, education string) e
 			}
 		}
 
-		fmt.Println("ID Created: ", eduAttain.ID)
+		retainEdu = append(retainEdu, eduAttain.ID)
+	}
+
+	if err := h.DB.Preload("Educations").Find(&profile).Error; err != nil {
+		fmt.Println("Error Retrieving Data: ", err)
+	} else {
+
+		for _, edu := range profile.Educations {
+			if !functions.ArrayContains(retainEdu, edu.ID) {
+				if err := h.DB.Delete(&edu).Error; err != nil {
+					fmt.Println("Error Deleting Education", err)
+				}
+			}
+		}
+
 	}
 
 	return nil

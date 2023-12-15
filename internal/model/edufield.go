@@ -8,7 +8,7 @@ import (
 
 type EduField struct {
 	gorm.Model
-	EduID uint   `json:"edu_id"`
+	EduID uint   `gorm:"column:edu_id" json:"edu_id"`
 	Key   string `gorm:"column:key" json:"key"`
 	Value string `gorm:"column:value" json:"value"`
 }

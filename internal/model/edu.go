@@ -7,7 +7,7 @@ import (
 type Edu struct {
 	gorm.Model
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-	Fields    []EduField     `gorm:"foreignKey:edu_id"`
+	Fields    []EduField     `gorm:"foreignKey:edu_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"fields"`
 	UserID    uint           `json:"user_id"`
 }
 type EduResponse struct {
