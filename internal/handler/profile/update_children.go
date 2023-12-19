@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jcalabing/hrmis-api/internal/common/errors"
+	"github.com/jcalabing/hrmis-api/internal/common/functions"
 	"github.com/jcalabing/hrmis-api/internal/model"
 )
 
@@ -87,7 +88,25 @@ func UpdateChildren(h *handler, c *fiber.Ctx, profile model.User, children strin
 		}
 	}
 
+	if err := h.DB.Preload("Children").Find(&profile).Error; err != nil {
+		fmt.Println("Error Retrieving Data: ", err)
+	} else {
+		for _, child := range profile.Children {
+			if !functions.ArrayContains(childIDS, child.ID) {
+				if err := h.DB.Delete(&child).Error; err != nil {
+					tx.Rollback()
+					fmt.Println("Error Deleting Education", err)
+					return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
+						fiber.StatusInternalServerError,
+						"",
+						"Error occurred while deleting child.",
+					))
+				}
+			}
+		}
+
+	}
+
 	tx.Commit() // Commit the transaction if all operations are successful
-	fmt.Println(childIDS)
 	return nil
 }
