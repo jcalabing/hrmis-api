@@ -8,7 +8,7 @@ import (
 
 type WorkField struct {
 	gorm.Model
-	WorkID uint   `gorm:"column:edu_id" json:"edu_id"`
+	WorkID uint   `gorm:"column:work_id" json:"work_id"`
 	Key    string `gorm:"column:key" json:"key"`
 	Value  string `gorm:"column:value" json:"value"`
 }
@@ -18,9 +18,9 @@ type WorkShortenField struct {
 	Value string `json:"value"`
 }
 
-func ConvertToWorkShortenField(edufield WorkField) WorkShortenField {
+func ConvertToWorkShortenField(workfield WorkField) WorkShortenField {
 	return WorkShortenField{
-		Key:   strings.ToLower(edufield.Key),
-		Value: edufield.Value,
+		Key:   strings.ToLower(workfield.Key),
+		Value: workfield.Value,
 	}
 }

@@ -31,7 +31,7 @@ type UserResponse struct {
 }
 
 func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
-	db.Preload("Fields").Preload("Educations").Preload("Children").Preload("Eligibilities").Find(&user)
+	db.Preload("Fields").Preload("Educations").Preload("Children").Preload("Eligibilities").Preload("Works").Find(&user)
 	shortenedFields := make([]UserShortenField, len(user.Fields))
 
 	//user profile fields
@@ -60,11 +60,20 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 	//eligibility fields
 	var eliResponse []interface{}
 
-	fmt.Println(user.Eligibilities)
 	for _, eliData := range user.Eligibilities {
 		eliconvertedData := ConvertToEliResponse(db, eliData).Fields
 		eliconvertedData["id"] = eliData.ID
 		eliResponse = append(eliResponse, eliconvertedData)
+	}
+
+	//Works Fields
+	var workResponse []interface{}
+
+	fmt.Println(user.Works)
+	for _, workData := range user.Works {
+		workconvertedData := ConvertToWorkResponse(db, workData).Fields
+		workconvertedData["id"] = workData.ID
+		workResponse = append(workResponse, workconvertedData)
 	}
 
 	return UserResponse{
@@ -75,5 +84,6 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 		Educations:    eduResponse,
 		Children:      childResponse,
 		Eligibilities: eliResponse,
+		Works:         workResponse,
 	}
 }
