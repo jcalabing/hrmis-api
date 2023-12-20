@@ -24,6 +24,10 @@ func Init(url string) *gorm.DB {
 	db.AutoMigrate(&model.EliField{})
 	db.AutoMigrate(&model.Work{})
 	db.AutoMigrate(&model.WorkField{})
+	db.AutoMigrate(&model.Vol{})
+	db.AutoMigrate(&model.VolField{})
+	db.AutoMigrate(&model.Learn{})
+	db.AutoMigrate(&model.LearnField{})
 
 	return db
 }

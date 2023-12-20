@@ -1,7 +1,7 @@
 package model
 
 import (
-	"fmt"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -18,6 +18,8 @@ type User struct {
 	Children      []Children     `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"children"`
 	Eligibilities []Eli          `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"eligibilities"`
 	Works         []Work         `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"works"`
+	Voluntaries   []Vol          `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"voluntaries"`
+	Learns        []Learn        `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"learns"`
 }
 type UserResponse struct {
 	Id            int                `json:"id"`
@@ -28,10 +30,13 @@ type UserResponse struct {
 	Children      []ChildrenResponse `json:"children"`
 	Eligibilities []interface{}      `json:"eligibilities"`
 	Works         []interface{}      `json:"works"`
+	Voluntaries   []interface{}      `json:"voluntaries"`
+	Learns        []interface{}      `json:"learns"`
 }
 
 func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
-	db.Preload("Fields").Preload("Educations").Preload("Children").Preload("Eligibilities").Preload("Works").Find(&user)
+	db.Preload("Fields").Preload("Educations").Preload("Children").Preload("Eligibilities").Preload("Works").Preload("Voluntaries").Preload("Learns").Find(&user)
+
 	shortenedFields := make([]UserShortenField, len(user.Fields))
 
 	//user profile fields
@@ -69,11 +74,28 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 	//Works Fields
 	var workResponse []interface{}
 
-	fmt.Println(user.Works)
 	for _, workData := range user.Works {
 		workconvertedData := ConvertToWorkResponse(db, workData).Fields
 		workconvertedData["id"] = workData.ID
 		workResponse = append(workResponse, workconvertedData)
+	}
+
+	//Voluntary Works
+	var volResponse []interface{}
+
+	for _, volData := range user.Voluntaries {
+		volconvertedData := ConvertToVolResponse(db, volData).Fields
+		volconvertedData["id"] = volData.ID
+		volResponse = append(volResponse, volconvertedData)
+	}
+
+	//Learning Works
+	var learnResponse []interface{}
+
+	for _, learnData := range user.Learns {
+		learnconvertedData := ConvertToLearnResponse(db, learnData).Fields
+		learnconvertedData["id"] = learnData.ID
+		learnResponse = append(learnResponse, learnconvertedData)
 	}
 
 	return UserResponse{
@@ -85,5 +107,26 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 		Children:      childResponse,
 		Eligibilities: eliResponse,
 		Works:         workResponse,
+		Voluntaries:   volResponse,
+		Learns:        learnResponse,
+	}
+}
+
+type UserField struct {
+	gorm.Model
+	UserID uint   `json:"user_id"`
+	Key    string `gorm:"column:key" json:"key"`
+	Value  string `gorm:"column:value" json:"value"`
+}
+
+type UserShortenField struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+func ConvertToUserShortenField(userfield UserField) UserShortenField {
+	return UserShortenField{
+		Key:   strings.ToLower(userfield.Key),
+		Value: userfield.Value,
 	}
 }

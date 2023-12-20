@@ -94,6 +94,8 @@ type CreateRequestBody struct {
 	Children                    string `json:"children"`
 	Eligibility                 string `json:"eligibility"`
 	Work                        string `json:"work"`
+	Vol                         string `json:"voluntaries"`
+	Learn                       string `json:"learns"`
 }
 
 func (h *handler) UpdateProfile(c *fiber.Ctx) error {
@@ -160,6 +162,15 @@ func (h *handler) UpdateProfile(c *fiber.Ctx) error {
 
 	///// update Work
 	if err := UpdateWork(h, c, profile, body.Work); err != nil {
+		return err
+	}
+	///// update Voluntaries
+	if err := UpdateVol(h, c, profile, body.Vol); err != nil {
+		return err
+	}
+
+	///// update Learnings
+	if err := UpdateLearn(h, c, profile, body.Learn); err != nil {
 		return err
 	}
 
