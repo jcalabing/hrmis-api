@@ -29,6 +29,8 @@ func Init(url string) *gorm.DB {
 	db.AutoMigrate(&model.Learn{})
 	db.AutoMigrate(&model.LearnField{})
 	db.AutoMigrate(&model.Skill{})
+	db.AutoMigrate(&model.Assoc{})
+	db.AutoMigrate(&model.Reference{})
 
 	return db
 }

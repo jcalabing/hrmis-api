@@ -21,23 +21,27 @@ type User struct {
 	Voluntaries   []Vol          `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"voluntaries"`
 	Learns        []Learn        `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"learns"`
 	Skills        []Skill        `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"skills"`
+	Associations  []Assoc        `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"associations"`
+	References    []Reference    `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"references"`
 }
 type UserResponse struct {
-	Id            int                `json:"id"`
-	Username      string             `json:"username"`
-	Email         string             `json:"email"`
-	Fields        map[string]string  `json:"fields"`
-	Educations    []interface{}      `json:"educations"`
-	Children      []ChildrenResponse `json:"children"`
-	Eligibilities []interface{}      `json:"eligibilities"`
-	Works         []interface{}      `json:"works"`
-	Voluntaries   []interface{}      `json:"voluntaries"`
-	Learns        []interface{}      `json:"learns"`
-	Skills        []SkillResponse    `json:"skills"`
+	Id            int                 `json:"id"`
+	Username      string              `json:"username"`
+	Email         string              `json:"email"`
+	Fields        map[string]string   `json:"fields"`
+	Educations    []interface{}       `json:"educations"`
+	Children      []ChildrenResponse  `json:"children"`
+	Eligibilities []interface{}       `json:"eligibilities"`
+	Works         []interface{}       `json:"works"`
+	Voluntaries   []interface{}       `json:"voluntaries"`
+	Learns        []interface{}       `json:"learns"`
+	Skills        []SkillResponse     `json:"skills"`
+	Associations  []AssocResponse     `json:"associations"`
+	References    []ReferenceResponse `json:"references"`
 }
 
 func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
-	db.Preload("Fields").Preload("Educations").Preload("Children").Preload("Eligibilities").Preload("Works").Preload("Voluntaries").Preload("Learns").Preload("Skills").Find(&user)
+	db.Preload("Fields").Preload("Educations").Preload("Children").Preload("Eligibilities").Preload("Works").Preload("Voluntaries").Preload("Learns").Preload("Skills").Preload("Associations").Preload("References").Find(&user)
 
 	shortenedFields := make([]UserShortenField, len(user.Fields))
 
@@ -103,6 +107,12 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 	//user skills fields
 	skillResponse := ConvertToSkillResponse(db, user.Skills)
 
+	//user assocs fields
+	assocResponse := ConvertToAssocResponse(db, user.Associations)
+
+	//user references fields
+	referenceResponse := ConvertToReferenceResponse(db, user.References)
+
 	return UserResponse{
 		Id:            int(user.ID),
 		Username:      user.Username,
@@ -115,6 +125,8 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 		Voluntaries:   volResponse,
 		Learns:        learnResponse,
 		Skills:        skillResponse,
+		Associations:  assocResponse,
+		References:    referenceResponse,
 	}
 }
 
