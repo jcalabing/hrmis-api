@@ -41,7 +41,13 @@ type UserResponse struct {
 }
 
 func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
-	db.Preload("Fields").Preload("Educations").Preload("Children").Preload("Eligibilities").Preload("Works").Preload("Voluntaries").Preload("Learns").Preload("Skills").Preload("Associations").Preload("References").Find(&user)
+	// db.Preload("Fields").Preload("Educations").Preload("Children").Preload("Eligibilities").Preload("Works").Preload("Voluntaries").Preload("Learns").Preload("Skills").Preload("Associations").Preload("References").Find(&user)
+
+	preloads := []string{"Fields", "Educations", "Children", "Eligibilities", "Works", "Voluntaries", "Learns", "Skills", "Associations", "References"}
+
+	for _, preload := range preloads {
+		db.Preload(preload).Find(&user)
+	}
 
 	shortenedFields := make([]UserShortenField, len(user.Fields))
 
