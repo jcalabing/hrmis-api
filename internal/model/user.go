@@ -20,6 +20,7 @@ type User struct {
 	Works         []Work         `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"works"`
 	Voluntaries   []Vol          `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"voluntaries"`
 	Learns        []Learn        `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"learns"`
+	Skills        []Skill        `gorm:"foreignKey:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"skills"`
 }
 type UserResponse struct {
 	Id            int                `json:"id"`
@@ -32,10 +33,11 @@ type UserResponse struct {
 	Works         []interface{}      `json:"works"`
 	Voluntaries   []interface{}      `json:"voluntaries"`
 	Learns        []interface{}      `json:"learns"`
+	Skills        []SkillResponse    `json:"skills"`
 }
 
 func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
-	db.Preload("Fields").Preload("Educations").Preload("Children").Preload("Eligibilities").Preload("Works").Preload("Voluntaries").Preload("Learns").Find(&user)
+	db.Preload("Fields").Preload("Educations").Preload("Children").Preload("Eligibilities").Preload("Works").Preload("Voluntaries").Preload("Learns").Preload("Skills").Find(&user)
 
 	shortenedFields := make([]UserShortenField, len(user.Fields))
 
@@ -98,6 +100,9 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 		learnResponse = append(learnResponse, learnconvertedData)
 	}
 
+	//user skills fields
+	skillResponse := ConvertToSkillResponse(db, user.Skills)
+
 	return UserResponse{
 		Id:            int(user.ID),
 		Username:      user.Username,
@@ -109,6 +114,7 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 		Works:         workResponse,
 		Voluntaries:   volResponse,
 		Learns:        learnResponse,
+		Skills:        skillResponse,
 	}
 }
 
