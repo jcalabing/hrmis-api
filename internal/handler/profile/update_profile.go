@@ -53,6 +53,7 @@ type CreateRequestBody struct {
 	Spousefirstname             string `json:"spousefirstname"`
 	Spousemiddlename            string `json:"spousemiddlename"`
 	Spousextname                string `json:"spousextname"`
+	Spousenumber                string `json:"spousenumber"`
 	Spouseoccupation            string `json:"spouseoccupation"`
 	Spouseemployer              string `json:"spouseemployer"`
 	Spousebusinessaddress       string `json:"spousebusinessaddress"`
@@ -69,6 +70,7 @@ type CreateRequestBody struct {
 	Guiltyofoffense             string `json:"guiltyofoffense"`
 	Guiltyofoffensedetail       string `json:"guiltyofoffensedetail"`
 	Criminallycharged           string `json:"criminallycharged"`
+	Criminallychargeddate       string `json:"criminallychargeddate"`
 	Criminallychargeddetails    string `json:"criminallychargeddetails"`
 	Criminalconvicted           string `json:"criminalconvicted"`
 	Criminalconvicteddetails    string `json:"criminalconvicteddetails"`
@@ -86,10 +88,8 @@ type CreateRequestBody struct {
 	Pwddetails                  string `json:"pwddetails"`
 	Soloparent                  string `json:"soloparent"`
 	Soloparentdetails           string `json:"soloparentdetails"`
-	Filipino                    string `json:"filipino"`
+	Citizenship                 string `json:"citizenship"`
 	Dualcitizenship             string `json:"dualcitizenship"`
-	Bybirth                     string `json:"bybirth"`
-	Naturalized                 string `json:"naturalized"`
 	Education                   string `json:"education"`
 	Children                    string `json:"children"`
 	Eligibility                 string `json:"eligibility"`

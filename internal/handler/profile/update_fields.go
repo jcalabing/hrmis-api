@@ -54,6 +54,7 @@ func UpdateFields(h *handler, c *fiber.Ctx, profile model.User, body interface{}
 		"Spousefirstname",
 		"Spousemiddlename",
 		"Spousextname",
+		"Spousenumber",
 		"Spouseoccupation",
 		"Spouseemployer",
 		"Spousebusinessaddress",
@@ -70,6 +71,7 @@ func UpdateFields(h *handler, c *fiber.Ctx, profile model.User, body interface{}
 		"Guiltyofoffense",
 		"Guiltyofoffensedetail",
 		"Criminallycharged",
+		"Criminallychargeddate",
 		"Criminallychargeddetails",
 		"Criminalconvicted",
 		"Criminalconvicteddetails",
@@ -87,10 +89,8 @@ func UpdateFields(h *handler, c *fiber.Ctx, profile model.User, body interface{}
 		"Pwddetails",
 		"Soloparent",
 		"Soloparentdetails",
-		"Filipino",
+		"Citizenship",
 		"Dualcitizenship",
-		"Bybirth",
-		"Naturalized",
 	}
 
 	for _, fieldName := range fieldlist {
