@@ -31,6 +31,7 @@ func Init(url string) *gorm.DB {
 	db.AutoMigrate(&model.Skill{})
 	db.AutoMigrate(&model.Assoc{})
 	db.AutoMigrate(&model.Reference{})
+	db.AutoMigrate(&model.Recognition{})
 
 	return db
 }

@@ -10,12 +10,12 @@ import (
 	"github.com/jcalabing/hrmis-api/internal/model"
 )
 
-type skill struct {
-	Skillhobby string      `json:"skillhobby"`
-	ID         interface{} `json:"id"`
+type distinction struct {
+	Recognition string      `json:"recognition"`
+	ID          interface{} `json:"id"`
 }
 
-func UpdateSkills(h *handler, c *fiber.Ctx, profile model.User, skillren string) error {
+func UpdateRecognitions(h *handler, c *fiber.Ctx, profile model.User, recognition string) error {
 	tx := h.DB.Begin()
 
 	if tx.Error != nil {
@@ -32,40 +32,40 @@ func UpdateSkills(h *handler, c *fiber.Ctx, profile model.User, skillren string)
 		}
 	}()
 
-	var skillArray []skill
+	var recognitionArray []distinction
 
 	// Unmarshal the JSON array into the map
-	if err := json.Unmarshal([]byte(skillren), &skillArray); err != nil {
+	if err := json.Unmarshal([]byte(recognition), &recognitionArray); err != nil {
 		tx.Rollback()
-		fmt.Println("Error unmarshaling Skill:", err)
+		fmt.Println("Error unmarshaling Recognition:", err)
 		return c.Status(fiber.StatusBadRequest).JSON(errors.NewErrorResponse(
 			fiber.StatusBadRequest,
 			"",
-			"Error occurred while parsing Skill JSON.",
+			"Error occurred while parsing Recognition JSON.",
 		))
 	}
 
-	var skillIDS []interface{}
-	for _, skill := range skillArray {
-		newSkill := model.Skill{
-			Skillhobby: skill.Skillhobby,
-			UserID:     profile.ID,
+	var recognitionIDS []interface{}
+	for _, recognition := range recognitionArray {
+		newRecognition := model.Recognition{
+			Recognition: recognition.Recognition,
+			UserID:      profile.ID,
 		}
-		if skill.ID == "" {
-			// Create a new skill if ID is empty
-			if result := tx.Create(&newSkill); result.Error != nil {
+		if recognition.ID == "" {
+			// Create a new recognition if ID is empty
+			if result := tx.Create(&newRecognition); result.Error != nil {
 				tx.Rollback()
 				return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
 					fiber.StatusInternalServerError,
 					"",
-					"Error occurred while creating the new Skill.",
+					"Error occurred while creating the new Recognition.",
 				))
 			}
-			skillIDS = append(skillIDS, newSkill.ID)
+			recognitionIDS = append(recognitionIDS, newRecognition.ID)
 		} else {
-			// Update an existing skill if ID is not empty
-			var oldSkillData model.Skill
-			if result := tx.First(&oldSkillData, skill.ID); result.Error != nil {
+			// Update an existing recognition if ID is not empty
+			var oldRecognitionData model.Recognition
+			if result := tx.First(&oldRecognitionData, recognition.ID); result.Error != nil {
 				tx.Rollback()
 				return c.Status(fiber.StatusBadRequest).JSON(errors.NewErrorResponse(
 					fiber.StatusBadRequest,
@@ -73,7 +73,7 @@ func UpdateSkills(h *handler, c *fiber.Ctx, profile model.User, skillren string)
 					"Education Not Found",
 				))
 			} else {
-				if err := tx.Model(&oldSkillData).Updates(&newSkill).Error; err != nil {
+				if err := tx.Model(&oldRecognitionData).Updates(&newRecognition).Error; err != nil {
 					tx.Rollback()
 					return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
 						fiber.StatusInternalServerError,
@@ -81,23 +81,23 @@ func UpdateSkills(h *handler, c *fiber.Ctx, profile model.User, skillren string)
 						"Error occurred while updating Child Data.",
 					))
 				}
-				skillIDS = append(skillIDS, oldSkillData.ID)
+				recognitionIDS = append(recognitionIDS, oldRecognitionData.ID)
 			}
 		}
 	}
 
-	if err := h.DB.Preload("Skills").Find(&profile).Error; err != nil {
+	if err := h.DB.Preload("Recognitions").Find(&profile).Error; err != nil {
 		fmt.Println("Error Retrieving Data: ", err)
 	} else {
-		for _, skill := range profile.Skills {
-			if !functions.ArrayContains(skillIDS, skill.ID) {
-				if err := h.DB.Delete(&skill).Error; err != nil {
+		for _, recognition := range profile.Recognitions {
+			if !functions.ArrayContains(recognitionIDS, recognition.ID) {
+				if err := h.DB.Delete(&recognition).Error; err != nil {
 					tx.Rollback()
 					fmt.Println("Error Deleting Education", err)
 					return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
 						fiber.StatusInternalServerError,
 						"",
-						"Error occurred while deleting skill.",
+						"Error occurred while deleting recognition.",
 					))
 				}
 			}

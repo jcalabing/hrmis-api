@@ -99,6 +99,7 @@ type CreateRequestBody struct {
 	Skills                      string `json:"skills"`
 	Associations                string `json:"associations"`
 	References                  string `json:"references"`
+	Recognitions                string `json:"recognitions"`
 }
 
 func (h *handler) UpdateProfile(c *fiber.Ctx) error {
@@ -188,6 +189,10 @@ func (h *handler) UpdateProfile(c *fiber.Ctx) error {
 	}
 	///// update References
 	if err := UpdateReferences(h, c, profile, body.References); err != nil {
+		return err
+	}
+	///// update References
+	if err := UpdateRecognitions(h, c, profile, body.Recognitions); err != nil {
 		return err
 	}
 
