@@ -83,6 +83,7 @@ func (h *handler) CreateProfilePic(c *fiber.Ctx) error {
 					"",
 					"Error occurred while querying the database.",
 				))
+
 			}
 		} else {
 			// If key exists, update the existing UserField
@@ -100,13 +101,6 @@ func (h *handler) CreateProfilePic(c *fiber.Ctx) error {
 			}
 		}
 
-		// if result := h.DB.Create(&userfield); result.Error != nil {
-		// 	return c.Status(fiber.StatusInternalServerError).JSON(errors.NewErrorResponse(
-		// 		fiber.StatusInternalServerError,
-		// 		"",
-		// 		"Error occurred while creating the new user field.",
-		// 	))
-		// }
 		c.SaveFile(file, "public/profile/"+userfield.Value)
 	}
 	return c.Status(fiber.StatusOK).JSON("OK upfile")
