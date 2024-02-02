@@ -10,6 +10,7 @@ import (
 	"github.com/jcalabing/hrmis-api/internal/handler/profile"
 	"github.com/jcalabing/hrmis-api/internal/handler/setup"
 	"github.com/jcalabing/hrmis-api/internal/handler/token"
+	"github.com/jcalabing/hrmis-api/internal/handler/upfile"
 	"github.com/jcalabing/hrmis-api/internal/handler/user"
 )
 
@@ -25,10 +26,14 @@ func main() {
 	app.Use(cors.New())
 	db := db.Init(c.DBUrl)
 
+	//public photos
+	app.Static("/photo", "./public/profile")
+
 	user.RegisterRoutes(app, db)
 	token.RegisterRoutes(app, db)
 	profile.RegisterRoutes(app, db)
 	setup.RegisterRoutes(app, db)
+	upfile.RegisterRoutes(app, db)
 
 	app.Listen(c.Port)
 }
