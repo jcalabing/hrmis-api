@@ -19,5 +19,7 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	routes.Get("/:id", h.GetUser)
 	routes.Get("/", h.GetUsers)
 	routes.Post("/", h.CreateUser)
+	routes.Put("/:id", h.UpdateUser)
+	routes.Patch("/:id", h.UpdatePass)
 
 }
