@@ -29,6 +29,7 @@ type UserResponse struct {
 	Id            int                   `json:"id"`
 	Username      string                `json:"username"`
 	Email         string                `json:"email"`
+	Active        string                `json:"active"`
 	Fields        map[string]string     `json:"fields"`
 	Educations    []interface{}         `json:"educations"`
 	Children      []ChildrenResponse    `json:"children"`
@@ -128,6 +129,7 @@ func ConvertToUserResponse(db *gorm.DB, user User) UserResponse {
 		Id:            int(user.ID),
 		Username:      user.Username,
 		Email:         user.Email,
+		Active:        user.Active,
 		Fields:        profileFieldResult,
 		Educations:    eduResponse,
 		Children:      childResponse,

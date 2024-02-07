@@ -29,7 +29,7 @@ func (h *handler) CreateToken(c *fiber.Ctx) error {
 
 	// Look for User
 	var user model.User
-	h.DB.Where("username = ? AND active = ?", body.Username, "YES").First(&user)
+	h.DB.Where("username = ? OR email = ?", body.Username, body.Username).Where("active = ?", "YES").First(&user)
 
 	if user.ID == 0 {
 		return c.Status(fiber.StatusUnauthorized).JSON(errors.UnAuthorized())
@@ -39,7 +39,6 @@ func (h *handler) CreateToken(c *fiber.Ctx) error {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 
 	if err != nil {
-
 		return c.Status(fiber.StatusUnauthorized).JSON(errors.UnAuthorized())
 	}
 
